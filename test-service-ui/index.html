@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Test Service</title>
+<script>
+function process() {
+  var x = document.getElementById("features");
+  if (x.value === "anagram") {
+  document.getElementById("getAnagrams").style.display = "block";
+  document.getElementById("getSuggestion").style.display = "none";
+  } else if (x.value === "suggest"){
+    document.getElementById("getAnagrams").style.display = "none";
+	document.getElementById("getSuggestion").style.display = "block";
+  } else{
+	document.getElementById("getAnagrams").style.display = "none";
+	document.getElementById("getSuggestion").style.display = "none";
+  }
+}
+
+async function getSuggestions(dinput) {
+	if(dinput){
+  const url = 'https://r9po3h1tcg.execute-api.us-east-1.amazonaws.com/dev/suggest?cquery='.concat(dinput);
+  var request = new Request(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+	  'Accept': 'application/json'
+    }
+});
+    let response = await fetch(request);
+	console.log(response);
+    let data = await response.json();
+    document.getElementById("pd_output").innerHTML = data.contacts[dinput];
+	} else{
+		document.getElementById("pd_output").innerHTML = "";
+	}
+}
+
+async function getAnagramData(dinput) {
+//alert(dinput);
+var myBody;
+var y = document.getElementById(dinput);
+//alert(y.value);
+  if (y.value) {
+	myBody = y.value;
+  }
+  //alert(myBody);
+  const url = 'https://r9po3h1tcg.execute-api.us-east-1.amazonaws.com/dev/anagrams';
+  var request = new Request(url, {
+    method: 'POST',
+    body: myBody,
+    headers: {
+      'Content-Type': 'application/json',
+	  'Accept': 'application/json'
+    }
+});
+    let response = await fetch(request);
+	console.log(response);
+    let data = await response.json();
+    document.getElementById("ga_output").innerHTML = data.output;
+}
+</script>
+</head>
+  <body>
+    <h1>Test Service</h1>
+<br><br>
+  <label for="features">Choose a functionality:</label>
+  <select name="features" id="features" onchange="process()">
+    <option value="none">None</option>
+    <option value="anagram">Group Anagrams</option>
+    <option value="suggest">Auto Suggestion</option>
+  </select>
+  <br><br>
+  
+  <div id="getAnagrams" style="display:none">
+  <b><label for="getAnagrams" >Group Anagrams</label></b>
+        <p>Input:
+            <input type="text" id="ai_input" name="anagram_input" />
+        </p>
+		<input type="submit" value="Submit" onclick="getAnagramData('ai_input')">
+		<br><br>
+	<textarea id="ga_output" rows="4" cols="50"></textarea>
+    </div><br>
+	<div id="getSuggestion" style="display:none">
+  <b><label for="getSuggestion" >Phone Directory: </label></b>
+        <p>Input:
+            <input type="text" id="pd_input" oninput="getSuggestions(this.value)"/>
+        </p>
+		<br><br>
+	<textarea id="pd_output" rows="4" cols="50"></textarea>
+    </div>
+	<br>
+  </body>
+</html>
